@@ -34,6 +34,10 @@ device.on("message", async (topic, payload) => {
       Key: fileKey,
     };
 
+    if (!fs.existsSync("./files")) {
+      fs.mkdirSync("./files");
+    }
+
     const fileStream = s3.getObject(downloadParams).createReadStream();
     const writeStream = fs.createWriteStream(`./files/${fileKey}`);
     const stream = fileStream.pipe(writeStream);
