@@ -1,15 +1,16 @@
 import AWSIoTData from "aws-iot-device-sdk";
 import AWS from "aws-sdk";
 import fs from "fs";
-import PdfPrinter from "pdf-to-printer";
+import { getPrinters, print } from "unix-print";
+
+getPrinters().then(console.log);
 
 const AWSCredentials = {
-  accessKeyId: "ASIAULIGBHUUVYGLYQHY",
-  secretAccessKey: "E0Ev6IYeg0edSFy31haJ61jmejq5XDUSmADtl8Lu",
-  sessionToken:
-    "FwoGZXIvYXdzEOL//////////wEaDLkfhuRu3k5aHVUOoSK3AYWLvXQ3xct24KzjNVeoVR3/Noyp1aFEA6nMtCQDRuGZvnbBIQEKW6UnxHNN3Nmg426SGLxcPIDCUjqOWB91/8Z8onhYeyat6t87keTqKzInUHrob3Kl0x6DZ6Y4mWB33KYxxuCyvqwYv0Rhjic7cEzQvv2c3yur9OIR3AxwYzPsLWu71NXwIAtiq4xBbEpynHzt1uSLhWAF04I3W1labw3pLmlS1chmdtks7o4fw8/RwkytOrZSGSjbhJapBjItiVmK3Zvu7TrZAEEaaTurOV7iBy/C9RJYLhvE6aTbsi1b/kBQRMUgdUq7VaTZ",
-};
-
+      accessKeyId: "ASIAULIGBHUUZLJWBQNF",
+      secretAccessKey: "zbO1KteyqkP/rqducUG2Ve9V2VkSK23cDDW1vPCA",
+      sessionToken:
+        "FwoGZXIvYXdzEIv//////////wEaDHnEjKe7a9CmUiz0HyK3ASVp6AUV/S69GgRYj+yOadN0xGRygi73XIkN37qTB33mYxSMWaHCVIvISOSdniyRsG11cwxBKZ4yHLZilntPGoa9y3G2Jw3w+HrGix3pv4vUAP0ZoH+0xbw048c6sJ7G3yVwlC8ViPf+Wdgr8y6qQkG3eAwPkD0GXgn5Rs8HTs6n7u7tKGS/86ooT+pR+NXiQ31OHapwa3YchVI6Gun+FPqwWW2RAAhJi5EHbBcFxqrxm4I6moxxaCikqfOpBjIto64CxmdBshRo9q7ZfYItxsLTXmcDETYS90NXsQseJYEm6Sdd04lP2T8nZc1Z",
+    };
 const s3 = new AWS.S3({ credentials: AWSCredentials, region: "us-east-1" });
 
 const device = AWSIoTData.device({
@@ -42,12 +43,11 @@ device.on("message", async (topic, payload) => {
     const writeStream = fs.createWriteStream(`./files/${fileKey}`);
     const stream = fileStream.pipe(writeStream);
     stream.on("finish", () => {
-      const printOptions = {
-        // pages: "1-3,5",
-        // scale: "fit",
-      };
+	const fileToPrint = `./files/${fileKey}`;
+	const printer = "PDF";
+	const options = ["-o landscape", "-o fit-to-page", "-o media=A4"];	
 
-      PdfPrinter.print(`./files/${fileKey}`, printOptions)
+    print(fileToPrint, printer, options)
         .then(() => {
           fs.unlinkSync(`./files/${fileKey}`);
         })
@@ -61,3 +61,4 @@ device.on("message", async (topic, payload) => {
 device.on("error", (...error) => {
   console.log(error);
 });
+
