@@ -1,13 +1,19 @@
 import AWS from "aws-sdk";
 import fs from "fs";
 import { getPrinters, print } from "unix-print";
-import { AWSCredentials, AWSIoTClient } from "./config/aws";
+import { AWSCredentials, AWSIoTClient } from "./config/aws.js";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 getPrinters().then(console.log);
 
-const s3 = new AWS.S3({ credentials: AWSCredentials, region: "us-east-1" });
+const s3 = new AWS.S3({
+  credentials: await AWSCredentials(),
+  region: "us-east-1",
+});
 
-const device = AWSIoTClient("raspberry-pi-device");
+const device = await AWSIoTClient("raspberry-pi-device");
 
 device.on("connect", () => {
   console.log("connected");
