@@ -43,7 +43,7 @@ device.on("message", async (topic, payload) => {
       print(fileToPrint, printer, options)
         .then(() => {
           fs.unlinkSync(`./files/${fileKey}`);
-          console.log("Printer Successfully");
+          console.log("Printed Successfully");
         })
         .catch((error) => {
           console.log(error);
