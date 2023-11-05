@@ -40,7 +40,7 @@ device.on("message", async (topic, payload) => {
       const fileToPrint = `./files/${fileKey}`;
       const options = ["-o landscape", "-o fit-to-page", "-o media=A4"];
 
-      print(fileToPrint, process.env.PRINTER, options)
+      print(fileToPrint, options)
         .then(() => {
           fs.unlinkSync(`./files/${fileKey}`);
           console.log("Printed Successfully");
