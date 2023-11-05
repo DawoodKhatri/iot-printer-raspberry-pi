@@ -12,6 +12,8 @@ if (!defaultPrinter) throw Error("Printer not Detected");
 
 if (!process.env.APP_URL) throw Error(".env incomplete");
 
+console.log(`Printer Detected: ${defaultPrinter.printer}`);
+
 const s3 = new AWS.S3({
   credentials: await AWSCredentials(),
   region: "us-east-1",
@@ -41,7 +43,7 @@ device.on("message", async (topic, payload) => {
     const stream = fileStream.pipe(writeStream);
     stream.on("finish", () => {
       const fileToPrint = `./files/${fileKey}`;
-      const options = ["-o landscape", "-o fit-to-page", "-o media=A4"];
+      const options = ["-o fit-to-page", "-o media=A4"];
 
       print(fileToPrint, defaultPrinter.printer, options)
         .then(() => {
