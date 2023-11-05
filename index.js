@@ -1,13 +1,16 @@
 import AWS from "aws-sdk";
 import fs from "fs";
-import { print } from "unix-print";
+import { getDefaultPrinter, print } from "unix-print";
 import { AWSCredentials, AWSIoTClient } from "./config/aws.js";
 import dotenv from "dotenv";
 
 dotenv.config();
 
-if (!process.env.APP_URL || !process.env.PRINTER)
-  throw Error(".env incomplete");
+const defaultPrinter = await getDefaultPrinter();
+
+if (!defaultPrinter) throw Error("Printer not Detected");
+
+if (!process.env.APP_URL) throw Error(".env incomplete");
 
 const s3 = new AWS.S3({
   credentials: await AWSCredentials(),
@@ -40,7 +43,7 @@ device.on("message", async (topic, payload) => {
       const fileToPrint = `./files/${fileKey}`;
       const options = ["-o landscape", "-o fit-to-page", "-o media=A4"];
 
-      print(fileToPrint, options)
+      print(fileToPrint, defaultPrinter.printer, options)
         .then(() => {
           fs.unlinkSync(`./files/${fileKey}`);
           console.log("Printed Successfully");
